@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,12 +9,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
+
 <body>
     <div class="container">
         <header>
-            <img src="./img/Cabecalho.png" alt="Cabeçalho" class="header-image">
+            <img src="Cabecalho.png" alt="Cabeçalho InterOp" class="header-image" onerror="this.style.display='none'">
         </header>
-        
+
         <main>
             <!-- Seção 1 - Identificação -->
             <section class="section" id="identificacao">
@@ -51,7 +53,8 @@
                                 <option value="Novembro">Novembro</option>
                                 <option value="Dezembro">Dezembro</option>
                             </select>
-                            <input type="number" id="anoReferencia" min="2020" max="2030" value="2025" placeholder="Ano" required>
+                            <input type="number" id="anoReferencia" min="2020" max="2030" value="2025" placeholder="Ano"
+                                required>
                         </div>
                     </div>
                 </div>
@@ -60,24 +63,25 @@
             <!-- Seção 2 - Atividades Realizadas -->
             <section class="section" id="atividades">
                 <h2>2 - Atividades Realizadas</h2>
-                
+
                 <div class="alert" id="successAlert">
                     Atividade adicionada com sucesso!
                 </div>
-                
+
                 <div class="alert" id="errorAlert">
                     Por favor, preencha todos os campos obrigatórios.
                 </div>
-                
+
                 <div class="table-container">
                     <table id="activitiesTable">
                         <thead>
                             <tr>
-                                <th class="date-column">Data</th>
-                                <th class="area-column">Área Demandante</th>
-                                <th class="activity-column">Atividade Realizada</th>
+                                <th class="date-column">Início</th>
+                                <th class="date-column">Fim</th>
+                                <th class="area-column">Área</th>
                                 <th class="hours-column">Horas</th>
                                 <th class="status-column">Situação</th>
+                                <th class="activity-column">Atividade</th>
                                 <th class="actions-column">Ações</th>
                             </tr>
                         </thead>
@@ -86,25 +90,30 @@
                         </tbody>
                     </table>
                 </div>
-                
+
                 <!-- Botão para mostrar formulário -->
                 <div class="add-activity-section">
                     <button type="button" class="btn-add-activity" onclick="mostrarFormulario()">
                         ➕ Adicionar Nova Atividade
                     </button>
                 </div>
-                
+
                 <!-- Formulário (inicialmente oculto) -->
                 <div class="form-container" id="formAdicionarAtividade" style="display: none;">
                     <div class="form-header">
-                        <h3>Adicionar Nova Atividade</h3>
+                        <h3 id="formTitulo">Adicionar Nova Atividade</h3>
                         <button type="button" class="btn-close" onclick="ocultarFormulario()">✕</button>
                     </div>
                     <form id="activityForm">
+                        <input type="hidden" id="editIndex" value="-1">
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="date">Data *</label>
-                                <input type="date" id="date" required>
+                                <label for="dataInicio">Data Início *</label>
+                                <input type="date" id="dataInicio" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="dataFim">Data Fim *</label>
+                                <input type="date" id="dataFim" required>
                             </div>
                             <div class="form-group">
                                 <label for="area">Área Demandante *</label>
@@ -121,15 +130,11 @@
                                     <option value="Licitação">Licitação</option>
                                 </select>
                             </div>
+                        </div>
+                        <div class="form-row">
                             <div class="form-group">
                                 <label for="hours">Horas *</label>
                                 <input type="number" id="hours" min="0" max="24" step="0.5" required>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group full-width">
-                                <label for="activity">Atividade Realizada *</label>
-                                <input type="text" id="activity" placeholder="Descreva a atividade realizada" required>
                             </div>
                             <div class="form-group">
                                 <label for="status">Situação *</label>
@@ -138,11 +143,19 @@
                                     <option value="Em andamento">Em andamento</option>
                                     <option value="Concluído">Concluído</option>
                                     <option value="Pendente">Pendente</option>
+                                    <option value="Cancelada">Cancelada</option>
                                 </select>
                             </div>
                         </div>
+                        <div class="form-row">
+                            <div class="form-group full-width">
+                                <label for="activity">Atividade Realizada *</label>
+                                <textarea id="activity" rows="3" placeholder="Descreva a atividade realizada"
+                                    required></textarea>
+                            </div>
+                        </div>
                         <div class="form-buttons">
-                            <button type="submit" class="btn-primary">Adicionar Atividade</button>
+                            <button type="submit" class="btn-primary" id="submitButton">Adicionar Atividade</button>
                             <button type="button" class="btn-cancel" onclick="ocultarFormulario()">Cancelar</button>
                         </div>
                     </form>
@@ -152,7 +165,7 @@
             <!-- Seção 3 - Síntese Mensal -->
             <section class="section" id="sintese">
                 <h2>3 - Síntese Mensal</h2>
-                
+
                 <div class="form-row">
                     <div class="form-group">
                         <label for="totalAtividades">Total de atividades realizadas</label>
@@ -163,12 +176,13 @@
                         <input type="number" id="totalHoras" step="0.1" readonly class="result-field" value="0">
                     </div>
                 </div>
-                
+
                 <div class="form-group full-width">
                     <label for="principaisResultados">Principais resultados alcançados:</label>
-                    <textarea id="principaisResultados" rows="4" placeholder="Descreva os principais resultados alcançados no período..."></textarea>
+                    <textarea id="principaisResultados" rows="4"
+                        placeholder="Descreva os principais resultados alcançados no período..."></textarea>
                 </div>
-                
+
                 <div class="calculate-section">
                     <button type="button" class="btn-secondary" onclick="calcularTotais()">
                         🔢 Calcular Totais
@@ -180,30 +194,35 @@
             <!-- Seção 4 - Sugestões e Melhorias -->
             <section class="section" id="sugestoes">
                 <h2>4 - Sugestões e Melhorias</h2>
-                
+
                 <div class="form-group full-width">
                     <label for="descricaoSituacao">Descrição da situação atual</label>
-                    <textarea id="descricaoSituacao" rows="3" placeholder="Descreva a situação atual que precisa ser melhorada..."></textarea>
+                    <textarea id="descricaoSituacao" rows="3"
+                        placeholder="Descreva a situação atual que precisa ser melhorada..."></textarea>
                 </div>
-                
+
                 <div class="form-group full-width">
                     <label for="processoSugerido">Processo sugerido</label>
-                    <textarea id="processoSugerido" rows="3" placeholder="Descreva o processo ou solução sugerida..."></textarea>
+                    <textarea id="processoSugerido" rows="3"
+                        placeholder="Descreva o processo ou solução sugerida..."></textarea>
                 </div>
-                
+
                 <div class="form-group full-width">
                     <label for="resultadoEsperado">Resultado esperado</label>
-                    <textarea id="resultadoEsperado" rows="3" placeholder="Descreva o resultado esperado com a implementação..."></textarea>
+                    <textarea id="resultadoEsperado" rows="3"
+                        placeholder="Descreva o resultado esperado com a implementação..."></textarea>
                 </div>
             </section>
 
-            <!-- Botão de Salvar Relatório -->
+            <!-- Botões de Ação -->
             <div class="actions">
                 <button class="btn-primary btn-large" onclick="gerarPDF()">Salvar como PDF</button>
+                <button class="btn-secondary btn-large" onclick="salvarDiario()">💾 Salvar Diário</button>
             </div>
         </main>
     </div>
 
     <script src="script.js"></script>
 </body>
+
 </html>

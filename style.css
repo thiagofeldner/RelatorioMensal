@@ -495,3 +495,139 @@ input:focus, select:focus, textarea:focus {
         font-size: 0.9em;
     }
 }
+
+/* Ajustes na tabela para melhor visualização */
+.date-column {
+    width: 90px;
+    font-size: 0.85em;
+}
+
+.area-column {
+    width: 120px;
+    font-size: 0.85em;
+}
+
+.hours-column {
+    width: 60px;
+    text-align: center;
+    font-size: 0.85em;
+}
+
+.status-column {
+    width: 100px;
+    font-size: 0.85em;
+}
+
+.activity-column {
+    min-width: 200px;
+    font-size: 0.85em;
+}
+
+.actions-column {
+    width: 100px;
+    text-align: center;
+}
+
+/* Botões de ação na tabela */
+.btn-edit {
+    color: #3498db;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+    margin-right: 5px;
+}
+
+.btn-edit:hover {
+    background-color: rgba(52, 152, 219, 0.1);
+}
+
+.btn-delete {
+    color: #e74c3c;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.btn-delete:hover {
+    background-color: rgba(231, 76, 60, 0.1);
+}
+
+/* Status colors */
+.status-em-andamento {
+    color: #f39c12;
+    font-weight: 500;
+    white-space: nowrap;
+    font-size: 0.85em;
+}
+
+.status-concluido {
+    color: #27ae60;
+    font-weight: 500;
+    white-space: nowrap;
+    font-size: 0.85em;
+}
+
+.status-pendente {
+    color: #e74c3c;
+    font-weight: 500;
+    white-space: nowrap;
+    font-size: 0.85em;
+}
+
+.status-cancelada {
+    color: #95a5a6;
+    font-weight: 500;
+    white-space: nowrap;
+    font-size: 0.85em;
+}
+
+/* Ajustes no formulário */
+.form-container textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* Remove o botão de atividade diária */
+.btn-add-daily {
+    display: none;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .date-column {
+        width: 80px;
+        font-size: 0.8em;
+    }
+    
+    .area-column {
+        width: 100px;
+        font-size: 0.8em;
+    }
+    
+    .hours-column {
+        width: 50px;
+        font-size: 0.8em;
+    }
+    
+    .status-column {
+        width: 90px;
+        font-size: 0.8em;
+    }
+    
+    .activity-column {
+        min-width: 150px;
+        font-size: 0.8em;
+    }
+    
+    .actions-column {
+        width: 80px;
+    }
+}
