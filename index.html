@@ -13,7 +13,8 @@
 <body>
     <div class="container">
         <header>
-            <img src="Cabecalho.png" alt="Cabeçalho InterOp" class="header-image" onerror="this.style.display='none'">
+            <img src="./img/Cabecalho.png" alt="Cabeçalho InterOp" class="header-image"
+                onerror="this.style.display='none'">
         </header>
 
         <main>
@@ -214,12 +215,37 @@
                 </div>
             </section>
 
-            <!-- Botões de Ação -->
+            <!-- Botão de Ação -->
             <div class="actions">
                 <button class="btn-primary btn-large" onclick="gerarPDF()">Salvar como PDF</button>
-                <button class="btn-secondary btn-large" onclick="salvarDiario()">💾 Salvar Diário</button>
             </div>
         </main>
+    </div>
+
+    <!-- Modal de Confirmação de Exclusão -->
+    <div class="modal-overlay" id="modalExclusao" style="display: none;">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>🗑️ Confirmar Exclusão</h3>
+                <button type="button" class="btn-close" onclick="fecharModalExclusao()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="warning-message">
+                    <div class="warning-icon">⚠️</div>
+                    <div class="warning-text">
+                        <p><strong>Tem certeza que deseja excluir esta atividade?</strong></p>
+                        <p class="warning-detail">Esta ação não pode ser desfeita.</p>
+                    </div>
+                </div>
+                <div class="activity-preview" id="previewAtividade">
+                    <!-- Preview da atividade será preenchido via JavaScript -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" onclick="fecharModalExclusao()">Cancelar</button>
+                <button type="button" class="btn-danger" onclick="confirmarExclusao()">Sim, Excluir</button>
+            </div>
+        </div>
     </div>
 
     <script src="script.js"></script>
