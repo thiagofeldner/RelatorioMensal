@@ -1,3 +1,8 @@
+// Variáveis globais para controle
+let editandoIndex = -1;
+let atividadeParaExcluir = null;
+let linhaParaExcluir = null;
+
 // Função para obter o ID único do usuário
 function obterUserId() {
   let userId = localStorage.getItem("relatorioUserId");
@@ -24,9 +29,6 @@ function converterDataISO(dataBR) {
   const [dia, mes, ano] = dataBR.split("/");
   return `${ano}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}`;
 }
-
-// Variável global para controlar a edição
-let editandoIndex = -1;
 
 // Função para mostrar o formulário
 function mostrarFormulario() {
@@ -70,8 +72,8 @@ function editarAtividade(button) {
     );
     document.getElementById("area").value = cells[2].textContent;
     document.getElementById("hours").value = cells[3].textContent;
-    document.getElementById("status").value = cells[5].textContent.trim();
-    document.getElementById("activity").value = cells[4].textContent;
+    document.getElementById("status").value = cells[4].textContent.trim();
+    document.getElementById("activity").value = cells[5].textContent;
     document.getElementById("editIndex").value = index;
 
     // Atualizar interface para modo edição
@@ -95,16 +97,78 @@ function ocultarFormulario() {
   editandoIndex = -1;
 }
 
-// Função para excluir uma atividade
+// Função para abrir modal de exclusão
 function deleteActivity(button) {
-  if (confirm("Tem certeza que deseja excluir esta atividade?")) {
-    const row = button.closest("tr");
-    row.style.opacity = "0.5";
+  const row = button.closest("tr");
+  const cells = row.cells;
+
+  // Coletar dados da atividade para mostrar no preview
+  const atividade = {
+    dataInicio: cells[0].textContent,
+    dataFim: cells[1].textContent,
+    area: cells[2].textContent,
+    horas: cells[3].textContent,
+    situacao: cells[4].textContent,
+    atividade: cells[5].textContent,
+  };
+
+  // Salvar referências para exclusão
+  atividadeParaExcluir = atividade;
+  linhaParaExcluir = row;
+
+  // Preencher preview da atividade
+  const previewHtml = `
+        <h4>Detalhes da Atividade:</h4>
+        <div class="preview-item">
+            <span class="preview-label">Período:</span>
+            <span class="preview-value">${atividade.dataInicio} a ${atividade.dataFim}</span>
+        </div>
+        <div class="preview-item">
+            <span class="preview-label">Área:</span>
+            <span class="preview-value">${atividade.area}</span>
+        </div>
+        <div class="preview-item">
+            <span class="preview-label">Horas:</span>
+            <span class="preview-value">${atividade.horas}h</span>
+        </div>
+        <div class="preview-item">
+            <span class="preview-label">Situação:</span>
+            <span class="preview-value">${atividade.situacao}</span>
+        </div>
+        <div class="preview-item">
+            <span class="preview-label">Descrição:</span>
+            <span class="preview-value">${atividade.atividade}</span>
+        </div>
+    `;
+
+  document.getElementById("previewAtividade").innerHTML = previewHtml;
+
+  // Mostrar modal
+  document.getElementById("modalExclusao").style.display = "flex";
+}
+
+// Função para fechar modal de exclusão
+function fecharModalExclusao() {
+  document.getElementById("modalExclusao").style.display = "none";
+  atividadeParaExcluir = null;
+  linhaParaExcluir = null;
+}
+
+// Função para confirmar exclusão
+function confirmarExclusao() {
+  if (linhaParaExcluir) {
+    // Animação de fade out
+    linhaParaExcluir.style.opacity = "0.5";
+    linhaParaExcluir.style.transform = "translateX(-20px)";
+
     setTimeout(() => {
-      row.remove();
+      linhaParaExcluir.remove();
       showAlert("Atividade excluída com sucesso!", "success");
       salvarAutomaticamente();
       calcularTotais();
+
+      // Fechar modal e limpar variáveis
+      fecharModalExclusao();
     }, 300);
   }
 }
@@ -171,8 +235,8 @@ document
                 <td>${formatarDataBR(dataFim)}</td>
                 <td>${area}</td>
                 <td>${hours}</td>
-                <td>${activity}</td>
                 <td><span class="${statusClass}">${status}</span></td>
+                <td>${activity}</td>
                 <td class="actions-column">
                     <button class="btn btn-edit" onclick="editarAtividade(this)">✏️</button>
                     <button class="btn btn-delete" onclick="deleteActivity(this)">🗑️</button>
@@ -197,8 +261,8 @@ document
             <td>${formatarDataBR(dataFim)}</td>
             <td>${area}</td>
             <td>${hours}</td>
-            <td>${activity}</td>
             <td><span class="${statusClass}">${status}</span></td>
+            <td>${activity}</td>
             <td class="actions-column">
                 <button class="btn btn-edit" onclick="editarAtividade(this)">✏️</button>
                 <button class="btn btn-delete" onclick="deleteActivity(this)">🗑️</button>
@@ -218,20 +282,22 @@ document
     calcularTotais();
   });
 
-// ... (mantenha as funções salvarDiario, calcularTotais, gerarPDF, salvarAutomaticamente)
-
-// Função para salvar backup diário
-function salvarDiario() {
+// Função para salvar automaticamente
+function salvarAutomaticamente() {
   const userId = obterUserId();
-  const dataAtual = obterDataAtual();
+  const nome = document.getElementById("nome").value;
+  const cargo = document.getElementById("cargo").value;
+  const email = document.getElementById("email").value;
+  const mesReferencia = document.getElementById("mesReferencia").value;
+  const anoReferencia = document.getElementById("anoReferencia").value;
 
   const relatorio = {
     identificacao: {
-      nome: document.getElementById("nome").value,
-      cargo: document.getElementById("cargo").value,
-      email: document.getElementById("email").value,
-      mesReferencia: document.getElementById("mesReferencia").value,
-      anoReferencia: document.getElementById("anoReferencia").value,
+      nome: nome,
+      cargo: cargo,
+      email: email,
+      mesReferencia: mesReferencia,
+      anoReferencia: anoReferencia,
     },
     atividades: Array.from(
       document.querySelectorAll("#activitiesTable tbody tr")
@@ -242,8 +308,8 @@ function salvarDiario() {
         dataFim: cells[1].textContent,
         area: cells[2].textContent,
         horas: cells[3].textContent,
-        atividade: cells[4].textContent,
-        situacao: cells[5].textContent,
+        situacao: cells[4].textContent,
+        atividade: cells[5].textContent,
       };
     }),
     totais: {
@@ -259,17 +325,67 @@ function salvarDiario() {
       processoSugerido: document.getElementById("processoSugerido").value,
       resultadoEsperado: document.getElementById("resultadoEsperado").value,
     },
-    dataBackup: new Date().toISOString(),
+    dataAutosalvamento: new Date().toISOString(),
   };
 
-  const backupKey = `backup_${userId}_${dataAtual}_${Date.now()}`;
-  localStorage.setItem(backupKey, JSON.stringify(relatorio));
-  salvarAutomaticamente();
-
-  showAlert("Backup diário salvo com sucesso! ✅", "success");
+  localStorage.setItem(`relatorioMensal_${userId}`, JSON.stringify(relatorio));
 }
 
-// ... (mantenha o restante do código do carregamento e outras funções)
+// Função para calcular totais
+function calcularTotais() {
+  const rows = document.querySelectorAll("#activitiesTable tbody tr");
+  let totalAtividades = 0;
+  let totalHoras = 0;
+
+  rows.forEach((row) => {
+    totalAtividades++;
+    const horasCell = row.cells[3];
+    const horas = parseFloat(horasCell.textContent) || 0;
+    totalHoras += horas;
+  });
+
+  document.getElementById("totalAtividades").value = totalAtividades;
+  document.getElementById("totalHoras").value = totalHoras.toFixed(1);
+
+  if (totalAtividades > 0) {
+    showAlert(
+      `Totais calculados: ${totalAtividades} atividades e ${totalHoras.toFixed(
+        1
+      )} horas`,
+      "success"
+    );
+  }
+
+  salvarAutomaticamente();
+}
+
+// Função para gerar PDF
+function gerarPDF() {
+  const nome = document.getElementById("nome").value;
+  const cargo = document.getElementById("cargo").value;
+  const email = document.getElementById("email").value;
+  const mesReferencia = document.getElementById("mesReferencia").value;
+  const anoReferencia = document.getElementById("anoReferencia").value;
+
+  if (!nome || !cargo || !email || !mesReferencia || !anoReferencia) {
+    showAlert(
+      "Por favor, preencha todos os campos da seção Identificação.",
+      "error"
+    );
+    document
+      .getElementById("identificacao")
+      .scrollIntoView({ behavior: "smooth" });
+    return;
+  }
+
+  calcularTotais();
+  salvarAutomaticamente();
+  window.print();
+  showAlert(
+    "PDF gerado com sucesso! Use Ctrl+P para salvar como PDF.",
+    "success"
+  );
+}
 
 // Carregar dados salvos ao iniciar
 document.addEventListener("DOMContentLoaded", function () {
@@ -349,11 +465,11 @@ document.addEventListener("DOMContentLoaded", function () {
                     <td>${atividade.dataFim}</td>
                     <td>${atividade.area}</td>
                     <td>${atividade.horas}</td>
-                    <td>${atividade.atividade}</td>
                     <td><span class="${statusClass}">${atividade.situacao.replace(
           /<[^>]*>/g,
           ""
         )}</span></td>
+                    <td>${atividade.atividade}</td>
                     <td class="actions-column">
                         <button class="btn btn-edit" onclick="editarAtividade(this)">✏️</button>
                         <button class="btn btn-delete" onclick="deleteActivity(this)">🗑️</button>
@@ -376,112 +492,18 @@ document.addEventListener("DOMContentLoaded", function () {
     input.addEventListener("input", salvarAutomaticamente);
   });
 
-  window.addEventListener("beforeunload", function () {
-    salvarDiario();
+  // Fechar modal ao clicar fora
+  document.addEventListener("click", function (e) {
+    const modal = document.getElementById("modalExclusao");
+    if (e.target === modal) {
+      fecharModalExclusao();
+    }
+  });
+
+  // Fechar modal com ESC
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") {
+      fecharModalExclusao();
+    }
   });
 });
-
-// Função para calcular totais
-function calcularTotais() {
-  const rows = document.querySelectorAll("#activitiesTable tbody tr");
-  let totalAtividades = 0;
-  let totalHoras = 0;
-
-  rows.forEach((row) => {
-    totalAtividades++;
-    const horasCell = row.cells[3];
-    const horas = parseFloat(horasCell.textContent) || 0;
-    totalHoras += horas;
-  });
-
-  document.getElementById("totalAtividades").value = totalAtividades;
-  document.getElementById("totalHoras").value = totalHoras.toFixed(1);
-
-  if (totalAtividades > 0) {
-    showAlert(
-      `Totais calculados: ${totalAtividades} atividades e ${totalHoras.toFixed(
-        1
-      )} horas`,
-      "success"
-    );
-  }
-
-  salvarAutomaticamente();
-}
-
-// Função para gerar PDF
-function gerarPDF() {
-  const nome = document.getElementById("nome").value;
-  const cargo = document.getElementById("cargo").value;
-  const email = document.getElementById("email").value;
-  const mesReferencia = document.getElementById("mesReferencia").value;
-  const anoReferencia = document.getElementById("anoReferencia").value;
-
-  if (!nome || !cargo || !email || !mesReferencia || !anoReferencia) {
-    showAlert(
-      "Por favor, preencha todos os campos da seção Identificação.",
-      "error"
-    );
-    document
-      .getElementById("identificacao")
-      .scrollIntoView({ behavior: "smooth" });
-    return;
-  }
-
-  calcularTotais();
-  salvarAutomaticamente();
-  window.print();
-  showAlert(
-    "PDF gerado com sucesso! Use Ctrl+P para salvar como PDF.",
-    "success"
-  );
-}
-
-// Função para salvar automaticamente
-function salvarAutomaticamente() {
-  const userId = obterUserId();
-  const nome = document.getElementById("nome").value;
-  const cargo = document.getElementById("cargo").value;
-  const email = document.getElementById("email").value;
-  const mesReferencia = document.getElementById("mesReferencia").value;
-  const anoReferencia = document.getElementById("anoReferencia").value;
-
-  const relatorio = {
-    identificacao: {
-      nome: nome,
-      cargo: cargo,
-      email: email,
-      mesReferencia: mesReferencia,
-      anoReferencia: anoReferencia,
-    },
-    atividades: Array.from(
-      document.querySelectorAll("#activitiesTable tbody tr")
-    ).map((row) => {
-      const cells = row.cells;
-      return {
-        dataInicio: cells[0].textContent,
-        dataFim: cells[1].textContent,
-        area: cells[2].textContent,
-        horas: cells[3].textContent,
-        atividade: cells[4].textContent,
-        situacao: cells[5].textContent,
-      };
-    }),
-    totais: {
-      totalAtividades: document.getElementById("totalAtividades").value,
-      totalHoras: document.getElementById("totalHoras").value,
-    },
-    sintese: {
-      principaisResultados: document.getElementById("principaisResultados")
-        .value,
-    },
-    sugestoes: {
-      descricaoSituacao: document.getElementById("descricaoSituacao").value,
-      processoSugerido: document.getElementById("processoSugerido").value,
-      resultadoEsperado: document.getElementById("resultadoEsperado").value,
-    },
-    dataAutosalvamento: new Date().toISOString(),
-  };
-
-  localStorage.setItem(`relatorioMensal_${userId}`, JSON.stringify(relatorio));
-}
