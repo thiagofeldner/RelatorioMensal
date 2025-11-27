@@ -14,22 +14,6 @@ function obterUserId() {
   return userId;
 }
 
-// Função para obter a data atual no formato YYYY-MM-DD
-function obterDataAtual() {
-  return new Date().toISOString().split("T")[0];
-}
-
-// Função para formatar data para o formato brasileiro
-function formatarDataBR(data) {
-  return new Date(data + "T00:00:00").toLocaleDateString("pt-BR");
-}
-
-// Função para converter data BR para ISO (para edição)
-function converterDataISO(dataBR) {
-  const [dia, mes, ano] = dataBR.split("/");
-  return `${ano}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}`;
-}
-
 // Função para mostrar o formulário
 function mostrarFormulario() {
   const formulario = document.getElementById("formAdicionarAtividade");
@@ -40,10 +24,6 @@ function mostrarFormulario() {
   document.getElementById("formTitulo").textContent =
     "Adicionar Nova Atividade";
   document.getElementById("submitButton").textContent = "Adicionar Atividade";
-
-  // Definir data atual como padrão
-  const dataAtual = obterDataAtual();
-  document.getElementById("data").value = dataAtual;
 
   editandoIndex = -1;
 
@@ -63,13 +43,10 @@ function editarAtividade(button) {
     const cells = row.cells;
 
     // Preencher formulário com dados da linha
-    document.getElementById("data").value = converterDataISO(
-      cells[0].textContent
-    );
-    document.getElementById("area").value = cells[1].textContent;
-    document.getElementById("hours").value = cells[2].textContent;
-    document.getElementById("status").value = cells[3].textContent.trim();
-    document.getElementById("activity").value = cells[4].textContent;
+    document.getElementById("area").value = cells[0].textContent;
+    document.getElementById("hours").value = cells[1].textContent;
+    document.getElementById("status").value = cells[2].textContent.trim();
+    document.getElementById("activity").value = cells[3].textContent;
     document.getElementById("editIndex").value = index;
 
     // Atualizar interface para modo edição
@@ -100,11 +77,10 @@ function deleteActivity(button) {
 
   // Coletar dados da atividade para mostrar no preview
   const atividade = {
-    data: cells[0].textContent,
-    area: cells[1].textContent,
-    horas: cells[2].textContent,
-    situacao: cells[3].textContent,
-    atividade: cells[4].textContent,
+    area: cells[0].textContent,
+    horas: cells[1].textContent,
+    situacao: cells[2].textContent,
+    atividade: cells[3].textContent,
   };
 
   // Salvar referências para exclusão
@@ -114,10 +90,6 @@ function deleteActivity(button) {
   // Preencher preview da atividade
   const previewHtml = `
         <h4>Detalhes da Atividade:</h4>
-        <div class="preview-item">
-            <span class="preview-label">Data:</span>
-            <span class="preview-value">${atividade.data}</span>
-        </div>
         <div class="preview-item">
             <span class="preview-label">Área:</span>
             <span class="preview-value">${atividade.area}</span>
@@ -190,7 +162,6 @@ document
     e.preventDefault();
 
     // Obter valores do formulário
-    const data = document.getElementById("data").value;
     const area = document.getElementById("area").value;
     const activity = document.getElementById("activity").value;
     const hours = document.getElementById("hours").value;
@@ -198,7 +169,7 @@ document
     const editIndex = parseInt(document.getElementById("editIndex").value);
 
     // Validar campos obrigatórios
-    if (!data || !area || !activity || !hours || !status) {
+    if (!area || !activity || !hours || !status) {
       showAlert("Por favor, preencha todos os campos obrigatórios.", "error");
       return;
     }
@@ -219,7 +190,6 @@ document
         else if (status === "Cancelada") statusClass = "status-cancelada";
 
         row.innerHTML = `
-                <td>${formatarDataBR(data)}</td>
                 <td>${area}</td>
                 <td>${hours}</td>
                 <td><span class="${statusClass}">${status}</span></td>
@@ -244,7 +214,6 @@ document
       else if (status === "Cancelada") statusClass = "status-cancelada";
 
       newRow.innerHTML = `
-            <td>${formatarDataBR(data)}</td>
             <td>${area}</td>
             <td>${hours}</td>
             <td><span class="${statusClass}">${status}</span></td>
@@ -290,11 +259,10 @@ function salvarAutomaticamente() {
     ).map((row) => {
       const cells = row.cells;
       return {
-        data: cells[0].textContent,
-        area: cells[1].textContent,
-        horas: cells[2].textContent,
-        situacao: cells[3].textContent,
-        atividade: cells[4].textContent,
+        area: cells[0].textContent,
+        horas: cells[1].textContent,
+        situacao: cells[2].textContent,
+        atividade: cells[3].textContent,
       };
     }),
     totais: {
@@ -324,7 +292,7 @@ function calcularTotais() {
 
   rows.forEach((row) => {
     totalAtividades++;
-    const horasCell = row.cells[2];
+    const horasCell = row.cells[1];
     const horas = parseFloat(horasCell.textContent) || 0;
     totalHoras += horas;
   });
@@ -446,7 +414,6 @@ document.addEventListener("DOMContentLoaded", function () {
           statusClass = "status-cancelada";
 
         newRow.innerHTML = `
-                    <td>${atividade.data}</td>
                     <td>${atividade.area}</td>
                     <td>${atividade.horas}</td>
                     <td><span class="${statusClass}">${atividade.situacao.replace(
