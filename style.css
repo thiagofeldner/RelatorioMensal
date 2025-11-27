@@ -68,7 +68,7 @@ header {
 table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 700px;
+    min-width: 600px;
     font-size: 0.9em;
 }
 
@@ -91,28 +91,28 @@ tr:hover {
 }
 
 .date-column {
-    width: 90px;
+    width: 100px;
     font-size: 0.85em;
 }
 
 .area-column {
-    width: 120px;
+    width: 140px;
     font-size: 0.85em;
 }
 
 .hours-column {
-    width: 60px;
+    width: 70px;
     text-align: center;
     font-size: 0.85em;
 }
 
 .status-column {
-    width: 100px;
+    width: 110px;
     font-size: 0.85em;
 }
 
 .activity-column {
-    min-width: 200px;
+    min-width: 250px;
     font-size: 0.85em;
 }
 

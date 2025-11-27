@@ -41,10 +41,9 @@ function mostrarFormulario() {
     "Adicionar Nova Atividade";
   document.getElementById("submitButton").textContent = "Adicionar Atividade";
 
-  // Definir data atual como padrão para início e fim
+  // Definir data atual como padrão
   const dataAtual = obterDataAtual();
-  document.getElementById("dataInicio").value = dataAtual;
-  document.getElementById("dataFim").value = dataAtual;
+  document.getElementById("data").value = dataAtual;
 
   editandoIndex = -1;
 
@@ -64,16 +63,13 @@ function editarAtividade(button) {
     const cells = row.cells;
 
     // Preencher formulário com dados da linha
-    document.getElementById("dataInicio").value = converterDataISO(
+    document.getElementById("data").value = converterDataISO(
       cells[0].textContent
     );
-    document.getElementById("dataFim").value = converterDataISO(
-      cells[1].textContent
-    );
-    document.getElementById("area").value = cells[2].textContent;
-    document.getElementById("hours").value = cells[3].textContent;
-    document.getElementById("status").value = cells[4].textContent.trim();
-    document.getElementById("activity").value = cells[5].textContent;
+    document.getElementById("area").value = cells[1].textContent;
+    document.getElementById("hours").value = cells[2].textContent;
+    document.getElementById("status").value = cells[3].textContent.trim();
+    document.getElementById("activity").value = cells[4].textContent;
     document.getElementById("editIndex").value = index;
 
     // Atualizar interface para modo edição
@@ -104,12 +100,11 @@ function deleteActivity(button) {
 
   // Coletar dados da atividade para mostrar no preview
   const atividade = {
-    dataInicio: cells[0].textContent,
-    dataFim: cells[1].textContent,
-    area: cells[2].textContent,
-    horas: cells[3].textContent,
-    situacao: cells[4].textContent,
-    atividade: cells[5].textContent,
+    data: cells[0].textContent,
+    area: cells[1].textContent,
+    horas: cells[2].textContent,
+    situacao: cells[3].textContent,
+    atividade: cells[4].textContent,
   };
 
   // Salvar referências para exclusão
@@ -120,8 +115,8 @@ function deleteActivity(button) {
   const previewHtml = `
         <h4>Detalhes da Atividade:</h4>
         <div class="preview-item">
-            <span class="preview-label">Período:</span>
-            <span class="preview-value">${atividade.dataInicio} a ${atividade.dataFim}</span>
+            <span class="preview-label">Data:</span>
+            <span class="preview-value">${atividade.data}</span>
         </div>
         <div class="preview-item">
             <span class="preview-label">Área:</span>
@@ -195,8 +190,7 @@ document
     e.preventDefault();
 
     // Obter valores do formulário
-    const dataInicio = document.getElementById("dataInicio").value;
-    const dataFim = document.getElementById("dataFim").value;
+    const data = document.getElementById("data").value;
     const area = document.getElementById("area").value;
     const activity = document.getElementById("activity").value;
     const hours = document.getElementById("hours").value;
@@ -204,14 +198,8 @@ document
     const editIndex = parseInt(document.getElementById("editIndex").value);
 
     // Validar campos obrigatórios
-    if (!dataInicio || !dataFim || !area || !activity || !hours || !status) {
+    if (!data || !area || !activity || !hours || !status) {
       showAlert("Por favor, preencha todos os campos obrigatórios.", "error");
-      return;
-    }
-
-    // Validar se data fim é maior ou igual à data início
-    if (new Date(dataFim) < new Date(dataInicio)) {
-      showAlert("A data fim não pode ser anterior à data início.", "error");
       return;
     }
 
@@ -231,8 +219,7 @@ document
         else if (status === "Cancelada") statusClass = "status-cancelada";
 
         row.innerHTML = `
-                <td>${formatarDataBR(dataInicio)}</td>
-                <td>${formatarDataBR(dataFim)}</td>
+                <td>${formatarDataBR(data)}</td>
                 <td>${area}</td>
                 <td>${hours}</td>
                 <td><span class="${statusClass}">${status}</span></td>
@@ -257,8 +244,7 @@ document
       else if (status === "Cancelada") statusClass = "status-cancelada";
 
       newRow.innerHTML = `
-            <td>${formatarDataBR(dataInicio)}</td>
-            <td>${formatarDataBR(dataFim)}</td>
+            <td>${formatarDataBR(data)}</td>
             <td>${area}</td>
             <td>${hours}</td>
             <td><span class="${statusClass}">${status}</span></td>
@@ -304,12 +290,11 @@ function salvarAutomaticamente() {
     ).map((row) => {
       const cells = row.cells;
       return {
-        dataInicio: cells[0].textContent,
-        dataFim: cells[1].textContent,
-        area: cells[2].textContent,
-        horas: cells[3].textContent,
-        situacao: cells[4].textContent,
-        atividade: cells[5].textContent,
+        data: cells[0].textContent,
+        area: cells[1].textContent,
+        horas: cells[2].textContent,
+        situacao: cells[3].textContent,
+        atividade: cells[4].textContent,
       };
     }),
     totais: {
@@ -339,7 +324,7 @@ function calcularTotais() {
 
   rows.forEach((row) => {
     totalAtividades++;
-    const horasCell = row.cells[3];
+    const horasCell = row.cells[2];
     const horas = parseFloat(horasCell.textContent) || 0;
     totalHoras += horas;
   });
@@ -461,8 +446,7 @@ document.addEventListener("DOMContentLoaded", function () {
           statusClass = "status-cancelada";
 
         newRow.innerHTML = `
-                    <td>${atividade.dataInicio}</td>
-                    <td>${atividade.dataFim}</td>
+                    <td>${atividade.data}</td>
                     <td>${atividade.area}</td>
                     <td>${atividade.horas}</td>
                     <td><span class="${statusClass}">${atividade.situacao.replace(
